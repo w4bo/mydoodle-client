@@ -1,4 +1,22 @@
 <template>
+    <div class="nav-container mb-3">
+        <nav class="navbar navbar-expand-md navbar-light bg-light" style="width: 100%; height: 65px; top: 0px; position: fixed; display: block">
+        <div class="container" >
+            <div class="navbar-brand logo"></div>
+            <div>
+            <div v-if="save_warn" class="alert alert-warning alert-dismissible fade show" style="padding-top: 0px, padding-bottom: 1px" role="alert">
+                <strong>Attenzione!</strong> Non è stato possibilie aggiornare le disponibilità.
+            </div>
+
+            <div v-if="save_ok" class="alert alert-success alert-dismissible fade show" style="padding-top: 0px, padding-bottom: 1px" role="alert">
+                <strong>Grazie!</strong> Le disponibilità sono state aggiornate.
+            </div>
+
+            <button type="button" class="btn btn-primary navbar-brand" v-if="!save_ok && !save_warn" style="padding-top: 1px; color: white" @click="update()">Save</button>
+            </div>
+        </div>
+        </nav>
+    </div>
     <div class="d-flex justify-content-center">
         <div class="row" style="max-width: 95%">
             <div class="d-flex">
@@ -8,7 +26,7 @@
                     </svg>
                 </button>
                 <div class="overflow-auto">
-                    <table class="table table-striped table-bordered" style="margin-top: 15px;" v-if="nonemptyweeks['' + week]">
+                    <table class="table table-striped table-bordered" style="margin-top: 25px;" v-if="!isMobile() && nonemptyweeks['' + week]">
                         <thead>
                         <th></th>
                         <template v-for="[index, turno] of Object.entries(header(turni))" :key="turno" style="text-align: center">
@@ -38,6 +56,32 @@
                         </tr>
                         </tbody>
                     </table>
+
+                    <table class="table table-striped table-bordered" style="margin-top: 25px;" v-if="isMobile() && nonemptyweeks['' + week]">
+                        <thead>
+                            <th></th><th>Slot</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="value of piv['---' + user.name + ' ' + week]" :key="value.id">
+                                    <td v-if="value.slotdate">{{ value.slotdate + ' ' + value.slotwhere + ' ' + value.slotbin }} </td>
+                                    <td v-if="value.slotdate">
+                                        <button type="button" class="btn"
+                                            v-bind:class="{
+                                                'btn-danger': value.checked === 'false' || value.checked === false,
+                                                'btn-success': value.checked === 'true' || value.checked === true,
+                                            }"
+                                            v-if="typeof value.checked !== 'undefined'"
+                                            :disabled="user.name !== value.id"
+                                            @click="
+                                                value.modified = true;
+                                                value.checked = toggle(value.checked);
+                                            ">
+                                            {{ (value.checked === "true" || value.checked === true) ? "✓" : "-" }}
+                                        </button>
+                                    </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <button type="button" v-if="typeof nonemptyweeks['' + weekboundaries[weekindex + 1]] !== 'undefined'" class="btn btn-light" @click="week = weekboundaries[++weekindex]">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
@@ -45,19 +89,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="d-flex justify-content-center" style="position: fixed; width: 100%; left: 0px; bottom:0; height: 40px; background-color: #ddd">
-                <br><br>
-                <button type="button" class="btn btn-primary" style="align: center; position: fixed; bottom:2px; right:2px; height: 35px;" @click="update()">Save</button>
-            </div>
         </div>
-    </div>
-
-    <div id="alert_warn" v-if="save_warn" class="alert alert-warning alert-dismissible fade show" style="left: 1%; top: 1%; display: block; position: absolute;" role="alert">
-        <strong>Attenzione!</strong> Non è stato possibilie aggiornare le disponibilità.
-    </div>
-
-    <div id="alert_succ" v-if="save_ok" class="alert alert-success alert-dismissible fade show" style="left: 1%; top: 1%; display: block; position: absolute;" role="alert">
-        <strong>Grazie!</strong> Le disponibilità sono state aggiornate.
     </div>
 
     <div class="d-flex justify-content-center">
@@ -86,13 +118,20 @@ export default {
         };
     },
     methods: {
+        isMobile() {
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                return true
+            } else {
+                return false
+            }
+        },
         pivot(turni) {
             let dict = {};
             const user = this.user;
             const nonemptyweeks = this.nonemptyweeks;
             const weekboundaries = this.weekboundaries;
             turni.forEach(function (turno) {
-                const key = (turno.id === user.name ? "---" : "") + turno.id + " " + turno.weekyear;
+                const key = (turno.id === user.name? "---" : "") + turno.id + " " + turno.weekyear;
                 dict[key] = (dict[key] ? dict[key] : [{id: turno.id, weekyear: turno.weekyear}]).concat([{
                     slotdate: turno.slotdate,
                     slotbin: turno.slotbin,
