@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-center">
     <div class="row" style="max-width: 95%">
-      <div class="d-flex justify-content-center overflow-auto">
+      <div class="d-flex">
         <button type="button" class="btn btn-light" @click="week = week - 1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -17,59 +17,55 @@
             ></path>
           </svg>
         </button>
-        <table class="table table-striped table-bordered">
-          <thead>
-            <th></th>
-            <template
-              v-for="[index, turno] of Object.entries(header(turni))"
-              :key="turno"
-              style="text-align: center"
-            >
-              <th v-if="parseInt('' + turno.weekyear) === parseInt('' + week)">
-                {{ index }}
-              </th>
-            </template>
-          </thead>
-          <tbody>
-            <tr v-for="turno of piv" :key="turno.id">
+        <div class=" overflow-auto">
+          <table class="table table-striped table-bordered" style="margin-top: 15px;">
+            <thead>
+              <th></th>
               <template
-                v-for="value in turno"
-                :key="value"
+                v-for="[index, turno] of Object.entries(header(turni))"
+                :key="turno"
                 style="text-align: center"
               >
-                <td
-                  v-if="parseInt('' + value.weekyear) === parseInt('' + week)"
-                >
-                  <div v-if="typeof value.checked === 'undefined'">
-                    {{ value.id }}
-                  </div>
-                  <button
-                    type="button"
-                    class="btn"
-                    v-bind:class="{
-                      'btn-danger':
-                        value.checked === 'false' || value.checked === false,
-                      'btn-success':
-                        value.checked === 'true' || value.checked === true,
-                    }"
-                    v-if="typeof value.checked !== 'undefined'"
-                    :disabled="user.name !== value.id"
-                    @click="
-                      value.modified = true;
-                      value.checked = toggle(value.checked);
-                    "
-                  >
-                    {{
-                      value.checked === "true" || value.checked === true
-                        ? "✓"
-                        : "-"
-                    }}
-                  </button>
-                </td>
+                <th v-if="parseInt('' + turno.weekyear) === parseInt('' + week)">
+                  {{ index }}
+                </th>
               </template>
-            </tr>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <tr v-for="turno of piv" :key="turno.id">
+                <template v-for="value in turno" :key="value">
+                  <td v-if="parseInt('' + value.weekyear) === parseInt('' + week)" :style="user.name == value.id ? 'background-color:  #f7dc6f' : ''">
+                    <div v-if="typeof value.checked === 'undefined'">
+                      {{ value.id }}
+                    </div>
+                    <button
+                      type="button"
+                      class="btn"
+                      v-bind:class="{
+                        'btn-danger':
+                          value.checked === 'false' || value.checked === false,
+                        'btn-success':
+                          value.checked === 'true' || value.checked === true,
+                      }"
+                      v-if="typeof value.checked !== 'undefined'"
+                      :disabled="user.name !== value.id"
+                      @click="
+                        value.modified = true;
+                        value.checked = toggle(value.checked);
+                      "
+                    >
+                      {{
+                        value.checked === "true" || value.checked === true
+                          ? "✓"
+                          : "-"
+                      }}
+                    </button>
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <button type="button" class="btn btn-light" @click="week = week + 1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -86,11 +82,12 @@
           </svg>
         </button>
       </div>
-      <div class="container d-flex justify-content-center">
+      <div class="d-flex justify-content-center" style="position: fixed; width: 100%; left: 0px; bottom:0; height: 40px; background-color: #ddd">
+        <br><br>
         <button
           type="button"
           class="btn btn-primary"
-          style="align: center"
+          style="align: center; position: fixed; bottom:2px; right:2px; height: 35px;"
           @click="update()"
         >
           Save
@@ -120,16 +117,12 @@ export default {
     print(value) {
       return true;
     },
-    pivot: function (turni) {
+    pivot(turni) {
       let dict = {};
+      const user = this.user;
       turni.forEach(function (turno) {
-        dict[turno.id + " " + turno.weekyear] = (dict[
-          turno.id + " " + turno.weekyear
-        ]
-          ? dict[turno.id + " " + turno.weekyear]
-          : [{ id: turno.id, weekyear: turno.weekyear }]
-        ).concat([
-          {
+        const key = (turno.id === user.name? "---": "") + turno.id + " " + turno.weekyear;
+        dict[key] = (dict[key] ? dict[key] : [{ id: turno.id, weekyear: turno.weekyear }]).concat([{
             slotdate: turno.slotdate,
             slotbin: turno.slotbin,
             slotwhere: turno.slotwhere,
@@ -140,7 +133,14 @@ export default {
           },
         ]);
       });
-      return dict;
+      const ordered = Object.keys(dict).sort().reduce(
+        (obj, key) => { 
+          obj[key] = dict[key]; 
+          return obj;
+        }, 
+        {}
+      );
+      return ordered;
     },
     update(then) {
       let res = [];

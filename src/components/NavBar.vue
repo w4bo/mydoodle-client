@@ -1,17 +1,9 @@
 <template>
   <div class="nav-container mb-3">
-    <nav class="navbar navbar-expand-md navbar-light bg-light">
-      <div class="container">
+    <nav class="navbar navbar-expand-md navbar-light bg-light" style="width: 100%; height: 65px; position: fixed">
+      <div class="container" >
         <div class="navbar-brand logo"></div>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
