@@ -159,7 +159,6 @@ export default {
         }
       }
       let s = JSON.stringify(res).replaceAll("@", "%40").replaceAll("[", "%5B").replaceAll("]", "%5D").replaceAll("{", "%7B").replaceAll("}", "%7D")
-      console.log()
       axios
         .post(process.env.VUE_APP_BE + "?cmd=update&turni=" + s)
         .then((response) => { if (then) then(); });
