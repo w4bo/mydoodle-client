@@ -10,7 +10,8 @@ export function createRouter(app: App): Router {
       {
         path: "/",
         name: "home",
-        component: Home
+        component: Profile,
+        beforeEnter: createAuthGuard(app)
       },
       {
         path: "/profile",
