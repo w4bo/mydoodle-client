@@ -36,8 +36,8 @@
                         <tbody>
                         <tr v-for="turno of piv" :key="turno.id">
                             <template v-for="value in turno" :key="value">
-                                <td v-if="parseInt('' + value.weekyear) === parseInt('' + week)" :style="user.name == value.id ? 'background-color:  #f7dc6f' : ''">
-                                    <div v-if="typeof value.checked === 'undefined'"> {{ value.id }} </div>
+                                <td v-if="parseInt('' + value.weekyear) === parseInt('' + week)" :style="user.name == value.id ? 'text-align: center; background-color:  #f7dc6f' : 'text-align: center;'">
+                                    <div v-if="typeof value.checked === 'undefined'" style="text-align: left;"> {{ value.id }} </div>
                                     <button type="button" class="btn"
                                         v-bind:class="{
                                             'btn-danger': value.checked === 'false' || value.checked === false,
@@ -57,28 +57,28 @@
                         </tbody>
                     </table>
 
-                    <table class="table table-striped table-bordered" style="margin-top: 25px;" v-if="isMobile() && nonemptyweeks['' + week]">
+                    <table class="table table-striped table-bordered" style="margin-top: 25px" v-if="isMobile() && nonemptyweeks['' + week]">
                         <thead>
-                            <th></th><th>Slot</th>
+                            <th>{{user.name}}</th><th>Disponibilità</th>
                         </thead>
                         <tbody>
                             <tr v-for="value of piv['---' + user.name + ' ' + week]" :key="value.id">
-                                    <td v-if="value.slotdate">{{ value.slotdate + ' ' + value.slotwhere + ' ' + value.slotbin }} </td>
-                                    <td v-if="value.slotdate">
-                                        <button type="button" class="btn"
-                                            v-bind:class="{
-                                                'btn-danger': value.checked === 'false' || value.checked === false,
-                                                'btn-success': value.checked === 'true' || value.checked === true,
-                                            }"
-                                            v-if="typeof value.checked !== 'undefined'"
-                                            :disabled="user.name !== value.id"
-                                            @click="
-                                                value.modified = true;
-                                                value.checked = toggle(value.checked);
-                                            ">
-                                            {{ (value.checked === "true" || value.checked === true) ? "✓" : "-" }}
-                                        </button>
-                                    </td>
+                                <td v-if="value.slotdate">{{ date2string(value) }} </td>
+                                <td v-if="value.slotdate" style="text-align: center">
+                                    <button type="button" class="btn"
+                                        v-bind:class="{
+                                            'btn-danger': value.checked === 'false' || value.checked === false,
+                                            'btn-success': value.checked === 'true' || value.checked === true,
+                                        }"
+                                        v-if="typeof value.checked !== 'undefined'"
+                                        :disabled="user.name !== value.id"
+                                        @click="
+                                            value.modified = true;
+                                            value.checked = toggle(value.checked);
+                                        ">
+                                        {{ (value.checked === "true" || value.checked === true) ? "✓" : "-" }}
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -138,6 +138,7 @@ export default {
                     slotwhere: turno.slotwhere,
                     checked: turno.checked,
                     weekyear: turno.weekyear,
+                    weekday: turno.weekday,
                     modified: false,
                     id: turno.id,
                 },
@@ -220,10 +221,47 @@ export default {
                     this.loading = false
                 });
         },
-        header: function (turni) {
+        day2string(weekday) {
+            switch(weekday) { 
+                case 2: { 
+                    return "Lun"
+                    break; 
+                } 
+                case 3: { 
+                    return "Mar"
+                    break; 
+                } 
+                case 4: { 
+                    return "Mer"
+                    break; 
+                } 
+                case 5: { 
+                    return "Gio"
+                    break; 
+                }
+                case 6: { 
+                    return "Ven"
+                    break; 
+                } 
+                case 7: { 
+                    return "Sab"
+                    break; 
+                } 
+                case 1: { 
+                    return "Dom"
+                    break; 
+                } 
+            } 
+            return turno.slotdate + " " + turno.weekday + " " + turno.slotwhere + " " + turno.slotbin
+        },
+        date2string(turno) {
+            return turno.slotdate + " " + this.day2string(turno.weekday) + " " + turno.slotwhere + " " + turno.slotbin
+        },
+        header(turni) {
             let dict = {};
+            const date2string = this.date2string
             turni.forEach(function (turno) {
-                dict[turno.slotdate + " " + turno.slotwhere + " " + turno.slotbin] = {
+                dict[date2string(turno)] = {
                     weekyear: turno.weekyear,
                 };
             });
