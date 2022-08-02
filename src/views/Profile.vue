@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-center">
     <div class="row" style="max-width: 95%">
       <div class="d-flex">
-        <button type="button" class="btn btn-light" @click="week = week - 1">
+        <button type="button" v-if="typeof nonemptyweeks['' + weekboundaries[weekindex - 1]] !== 'undefined'" class="btn btn-light" @click="week = weekboundaries[--weekindex]">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -17,18 +17,12 @@
             ></path>
           </svg>
         </button>
-        <div class=" overflow-auto">
-          <table class="table table-striped table-bordered" style="margin-top: 15px;">
+        <div class="overflow-auto">
+          <table class="table table-striped table-bordered" style="margin-top: 15px;" v-if="nonemptyweeks['' + week]">
             <thead>
               <th></th>
-              <template
-                v-for="[index, turno] of Object.entries(header(turni))"
-                :key="turno"
-                style="text-align: center"
-              >
-                <th v-if="parseInt('' + turno.weekyear) === parseInt('' + week)">
-                  {{ index }}
-                </th>
+              <template v-for="[index, turno] of Object.entries(header(turni))" :key="turno" style="text-align: center">
+                <th v-if="parseInt('' + turno.weekyear) === parseInt('' + week)"> {{ index }} </th>
               </template>
             </thead>
             <tbody>
@@ -54,11 +48,7 @@
                         value.checked = toggle(value.checked);
                       "
                     >
-                      {{
-                        value.checked === "true" || value.checked === true
-                          ? "✓"
-                          : "-"
-                      }}
+                      {{ (value.checked === "true" || value.checked === true) ? "✓" : "-" }}
                     </button>
                   </td>
                 </template>
@@ -66,7 +56,7 @@
             </tbody>
           </table>
         </div>
-        <button type="button" class="btn btn-light" @click="week = week + 1">
+        <button type="button" v-if="typeof nonemptyweeks['' + weekboundaries[weekindex + 1]] !== 'undefined'" class="btn btn-light" @click="week = weekboundaries[++weekindex]">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -120,6 +110,8 @@ export default {
     pivot(turni) {
       let dict = {};
       const user = this.user;
+      const nonemptyweeks = this.nonemptyweeks;
+      const weekboundaries = this.weekboundaries;
       turni.forEach(function (turno) {
         const key = (turno.id === user.name? "---": "") + turno.id + " " + turno.weekyear;
         dict[key] = (dict[key] ? dict[key] : [{ id: turno.id, weekyear: turno.weekyear }]).concat([{
@@ -132,7 +124,14 @@ export default {
             id: turno.id,
           },
         ]);
+        nonemptyweeks['' + turno.weekyear] = 1;
+        if (!weekboundaries.includes(turno.weekyear)) {
+          weekboundaries.push(turno.weekyear);
+        }
       });
+      console.log(weekboundaries)
+      console.log(nonemptyweeks)
+      this.weekindex = weekboundaries.indexOf(this.week)
       const ordered = Object.keys(dict).sort().reduce(
         (obj, key) => { 
           obj[key] = dict[key]; 
@@ -195,7 +194,11 @@ export default {
   },
   data() {
     return {
+      weekboundaries: [],
+      nonemptyweeks: {},
       popupattivo: false,
+      weekindex: -1,
+      weeknow: moment().week(),
       week: moment().week(),
       turni: [],
       piv: [],
