@@ -15,11 +15,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.0.2
-      - uses: ozaytsev86/create-env-file@v1
-        with:
-          ENV_VUE_APP_BE: ${{ secrets.VUE_APP_BE }}
-          ENV_VUE_APP_AUTH0_DOMAIN: ${{ secrets.VUE_APP_AUTH0_DOMAIN }}
-          ENV_VUE_APP_AUTH0_CLIENT_ID: ${{ secrets.VUE_APP_AUTH0_CLIENT_ID }}
       - name: Run init
         run: |
           npm install
