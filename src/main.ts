@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const domain = "" + process.env.VUE_APP_AUTH0_DOMAIN;
 const client_id = "" + process.env.VUE_APP_AUTH0_CLIENT_ID;
+const redirect_uri = "" + process.env.VUE_APP_REDIRECT_URI;
 const app = createApp(App);
 library.add(faLink, faUser, faPowerOff);
 app
@@ -21,7 +22,7 @@ app
     createAuth0({
       domain,
       client_id,
-      redirect_uri: window.location.origin,
+      redirect_uri: redirect_uri // window.location.origin,
     })
   )
   .component("font-awesome-icon", FontAwesomeIcon)
