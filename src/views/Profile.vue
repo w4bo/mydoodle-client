@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-center">
-    <div class="row">
-      <div class="d-flex justify-content-center">
+    <div class="row" style="max-width: 95%">
+      <div class="d-flex justify-content-center overflow-auto">
         <button type="button" class="btn btn-light" @click="week = week - 1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
