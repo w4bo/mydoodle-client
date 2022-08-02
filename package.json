@@ -2,7 +2,7 @@
   "name": "MyDoodle",
   "version": "0.0.1",
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "private": true,
   "scripts": {
