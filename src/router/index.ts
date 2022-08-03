@@ -8,7 +8,7 @@ export function createRouter(app: App): Router {
   return createVueRouter({
     routes: [
       {
-        path: "/",
+        path: "/mydoodle",
         name: "home",
         component: Profile,
         beforeEnter: createAuthGuard(app)
