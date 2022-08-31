@@ -178,7 +178,7 @@ export default {
             let s = JSON.stringify(res).replaceAll("@", "%40").replaceAll("[", "%5B").replaceAll("]", "%5D").replaceAll("{", "%7B").replaceAll("}", "%7D")
             this.loading = true
             axios
-                .post(process.env.VUE_APP_BE + "?token=" + this.token + "&cmd=update&turni=" + s)
+                .post(process.env.VUE_APP_BE + "&token=" + this.token + "&cmd=update&turni=" + s)
                 .then((response) => {
                     if (then) then();
                     this.save_ok = true;
@@ -207,7 +207,7 @@ export default {
         addUser(then) {
             this.loading = true
             axios
-                .post(process.env.VUE_APP_BE + "?token=" + this.token + "&cmd=adduser&id=" + this.user.name + "&firstname=foo" + "&lastname=bar")
+                .post(process.env.VUE_APP_BE + "&token=" + this.token + "&cmd=adduser&id=" + this.user.name + "&firstname=foo" + "&lastname=bar")
                 .then((response) => {
                     if (then) then();
                     this.loading = false
@@ -216,7 +216,7 @@ export default {
         getTurni() {
             this.loading = true
             axios
-                .get(process.env.VUE_APP_BE + "?token=" + this.token)
+                .get(process.env.VUE_APP_BE + "&token=" + this.token)
                 .then((response) => {
                     this.turni = response["data"];
                     this.piv = this.pivot(this.turni);
